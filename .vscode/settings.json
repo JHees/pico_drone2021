@@ -1,0 +1,31 @@
+{
+  "cmake.configureOnOpen": false,
+  "cmake.statusbar.advanced": {
+    "debug" : {
+      "visibility": "hidden"
+              },    "launch" : {
+      "visibility": "hidden"
+               },
+    "build" : {
+      "visibility": "hidden"
+               },
+    "buildTarget" : {
+      "visibility": "hidden"
+               },
+    },
+    "C_Cpp.dimInactiveRegions": false,
+    "files.associations": {
+      ".drone.yml": "bat",
+      "cctype": "cpp",
+      "cmath": "cpp",
+      "cstdarg": "cpp",
+      "cstdio": "cpp",
+      "cstdlib": "cpp",
+      "type_traits": "cpp",
+      "limits": "cpp",
+      "*.tcc": "cpp",
+      "cinttypes": "cpp",
+      "cstdint": "cpp",
+      "typeinfo": "cpp"
+    },
+}
