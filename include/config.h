@@ -1,0 +1,27 @@
+#define MOTOR_LF_PWM 0
+#define MOTOR_LF_DIR 1
+#define MOTOR_LF_MEASURE_A 3
+#define MOTOR_LF_MEASURE_B 2
+#define MOTOR_RF_PWM 5
+#define MOTOR_RF_DIR 4
+#define MOTOR_RF_MEASURE_A 6
+#define MOTOR_RF_MEASURE_B 7
+#define MOTOR_LB_PWM 8
+#define MOTOR_LB_DIR 9
+#define MOTOR_LB_MEASURE_A 15
+#define MOTOR_LB_MEASURE_B 14
+#define MOTOR_RB_PWM 13
+#define MOTOR_RB_DIR 12
+#define MOTOR_RB_MEASURE_A 11
+#define MOTOR_RB_MEASURE_B 10
+
+#define PS_DAT 21
+#define PS_COM 20
+#define PS_ATT 19
+#define PS_CLK 18
+
+#define UART_TX 16
+#define UART_RX 17
+#define UART_BAUD_RATE 115200
+
+#define MOTOR_MAX_SPEED 300

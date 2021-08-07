@@ -1,1 +1,4 @@
 [Bb]uild/
+.vscode/.cortex*
+.vscode/extensions.json
+reference/

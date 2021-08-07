@@ -1,7 +1,8 @@
 #include "pico/stdio.h"
 #include "hardware/spi.h"
 // #include "pico/binary_info.h"
-
+#define PS_PINOUT PS_CLK, PS_ATT, PS_COM, PS_DAT
+#define TICK_CLK 10
 class ps2
 {
 private:
@@ -80,11 +81,11 @@ private:
     inline void tick()
     {
         gpio_put(spi_clk, 1);
-        sleep_us(10);
+        sleep_us(TICK_CLK);
         gpio_put(spi_clk, 0);
-        sleep_us(10);
+        sleep_us(TICK_CLK);
         gpio_put(spi_clk, 1);
-        sleep_us(10);
+        sleep_us(TICK_CLK);
     };
     uint8_t write_read_8bits(uint8_t data = 0x0)
     {
@@ -175,23 +176,15 @@ public:
         cs_deselect();
         return true;
     };
-    uint8_t get_mode()
+    uint8_t get_mode() const
     {
-        cs_select();
-        write(head, 1);
-        uint8_t mode = write_read_8bits(head[1]);
-        cs_deselect();
-        return mode;
+        return ps2_data.mode;
     };
-    bool is_ready()
+    bool is_ready() const
     {
-        cs_select();
-        write(head, 2);
-        uint8_t ready = write_read_8bits();
-        cs_deselect();
-        return (ready == 0x5A);
+        return (ps2_data.ready == 0x5A);
     };
-    bool is_key_pressed(ps2_key key)
+    bool is_key_pressed(ps2_key key) const
     {
         assert(key != key_mask::LX && key != key_mask::LY && key != key_mask::RX && key != key_mask::RY);
         if (ps2_data.ready == 0x5A)
@@ -200,7 +193,7 @@ public:
             return 0;
     };
 
-    uint8_t key_value(ps2_key key)
+    uint8_t key_value(ps2_key key) const
     {
         if (ps2_data.ready != 0x5A)
             return 0;
@@ -210,7 +203,7 @@ public:
             return !bool(ps2_data.data[(uint16_t)key >> 8] & (uint16_t)key & 0x00ff);
     };
 
-    int16_t key_value_in_formate(ps2_key key, uint16_t range)
+    int16_t key_value_in_formate(ps2_key key, uint16_t range) const
     {
         int16_t value = key_value(key);
 
@@ -227,7 +220,7 @@ public:
         return value > 0 ? value / 128.0f * range : value / 127.0f * range;
     }
 
-    void test_all_key()
+    void test_all_key() const 
     {
 #define PRINT_KEY(key) is_key_pressed(ps2_key::key) ? printf(#key " ") : 0
 #define PRINT_KEY_VALUE(key) printf(#key " %u ", key_value(ps2_key::key))
