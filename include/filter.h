@@ -69,8 +69,8 @@ template <class FilterType, size_t length> class MiddleFilter : public queue<Fil
   private:
     // queue<FilterType, length> data;
     using queueClass = queue<FilterType, length>;
-    FilterType buffer[length];
-    bool flag; // true if it had been read
+    float buffer[length];
+    volatile bool flag; // true if it had been read
 
   public:
     MiddleFilter() = default;
@@ -97,12 +97,18 @@ template <class FilterType, size_t length> class MiddleFilter : public queue<Fil
             memcpy(buffer + queueClass::end_index, queueClass::data + queueClass::first_index,
                    (length - queueClass::first_index) * sizeof(FilterType));
         }
-        for (size_t i = queueClass::get_size(); i < length; ++i)
-        {
-            buffer[i] = 0;
-        }
-        std::sort(buffer, buffer + length);
+        std::sort(buffer, buffer + queueClass::get_size());
         flag = true;
-        return buffer[int(length - queueClass::get_size() / 2)];
+        return buffer[int(queueClass::get_size() / 2)];
+    }
+    float reciprocal_result()
+    {
+        for (size_t i = 0; i < queueClass::get_size(); ++i)
+        {
+            buffer[i] = float(1.0 / queueClass::data[i]);
+        }
+        std::sort(buffer, buffer + queueClass::get_size());
+        flag = true;
+        return buffer[int(queueClass::get_size() / 2)];
     }
 };

@@ -2,8 +2,17 @@
 
 #include "filter.h"
 #include <math.h>
+#define PID(TAG) pid_parameter(TAG##_Kp, TAG##_Ki, TAG##_Kd)
+
 #define SIG(x) (x < 0 ? -1 : 1)
 
+struct pid_parameter
+{
+    float Kp;
+    float Ki;
+    float Kd;
+    pid_parameter(float p, float i, float d) : Kp(p), Ki(i), Kd(d){};
+};
 template <class T> class pid
 {
   private:
@@ -14,6 +23,7 @@ template <class T> class pid
 
   public:
     pid() : pid(0, 0, 0){}; // zero
+    pid(pid_parameter p) : pid(p.Kp, p.Ki, p.Kd){};
     pid(float p, float i, float d) : Kp(p), Ki(i), Kd(d), control(0), time_last(0)
     {
         error.push_back(0);
@@ -29,16 +39,19 @@ template <class T> class pid
     }
     T adjust_in_formate(T measure, int16_t dead_zone, int16_t max)
     {
-        T err = target - measure;
         uint32_t time = time_us_32();
+        T err = target - measure;
+        // if (std::abs(err) <= dead_zone)
+        // {
+        //     control=0;
+        // }
+
         float timestep = ((int64_t)time - (int64_t)time_last) / 1e6;
         control += Kp * (err - error[1]) + Ki * err * timestep + Kd * (err - 2 * error[1] + error[0]) / timestep;
         error.push_back(err);
         time_last = time;
         if (std::abs(control) > max)
             control = SIG(control) * max;
-        if (std::abs(control) <= dead_zone)
-            control = 0;
         return control;
     }
 };

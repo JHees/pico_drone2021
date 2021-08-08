@@ -7,7 +7,7 @@
       "visibility": "hidden"
                },
     "build" : {
-      "visibility": "hidden"
+      // "visibility": "hidden"
                },
     "buildTarget" : {
       "visibility": "hidden"
@@ -26,6 +26,45 @@
       "*.tcc": "cpp",
       "cinttypes": "cpp",
       "cstdint": "cpp",
-      "typeinfo": "cpp"
+      "typeinfo": "cpp",
+      "array": "cpp",
+      "functional": "cpp",
+      "tuple": "cpp",
+      "deque": "cpp",
+      "string": "cpp",
+      "vector": "cpp",
+      "atomic": "cpp",
+      "bit": "cpp",
+      "clocale": "cpp",
+      "cstddef": "cpp",
+      "cwchar": "cpp",
+      "cwctype": "cpp",
+      "unordered_map": "cpp",
+      "exception": "cpp",
+      "algorithm": "cpp",
+      "iterator": "cpp",
+      "memory": "cpp",
+      "memory_resource": "cpp",
+      "numeric": "cpp",
+      "optional": "cpp",
+      "random": "cpp",
+      "string_view": "cpp",
+      "system_error": "cpp",
+      "utility": "cpp",
+      "fstream": "cpp",
+      "initializer_list": "cpp",
+      "iosfwd": "cpp",
+      "istream": "cpp",
+      "new": "cpp",
+      "ostream": "cpp",
+      "sstream": "cpp",
+      "stdexcept": "cpp",
+      "streambuf": "cpp"
     },
+    "clangd.arguments": [
+      "--compile-commands-dir=${workspaceFolder}/build",
+      "--completion-style=detailed",
+      "--header-insertion=never"
+    ]
+    
 }
