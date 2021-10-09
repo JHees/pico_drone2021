@@ -24,10 +24,12 @@
 #define UART_RX 17
 #define UART_BAUD_RATE 14400
 
-#define MOTOR_MAX_SPEED 500
+#define MOTOR_MAX_SPEED 1000
 #define MOTION_MAX_SPEED 300
+#define MOTOR_DEADZONE 20
+#define MOTION_DEADZONE 5
 
-#define MOTOR_LF_Kp 0.5f
+#define MOTOR_LF_Kp 0.3f
 #define MOTOR_LF_Ki 5
 #define MOTOR_LF_Kd 0.001f
 
@@ -35,22 +37,22 @@
 #define MOTOR_RF_Ki 8
 #define MOTOR_RF_Kd 0.001f
 
-#define MOTOR_LB_Kp 0.5f
-#define MOTOR_LB_Ki 8
+#define MOTOR_LB_Kp 0.3f
+#define MOTOR_LB_Ki 5
 #define MOTOR_LB_Kd 0.001f
 
-#define MOTOR_RB_Kp 0.5f
+#define MOTOR_RB_Kp 0.3f
 #define MOTOR_RB_Ki 5
 #define MOTOR_RB_Kd 0.001f
 
-#define MOTION_X_Kp 1
-#define MOTION_X_Ki 0
-#define MOTION_X_Kd 0
+#define POS_X_Kp 0
+#define POS_X_Ki 0
+#define POS_X_Kd 0
 
-#define MOTION_Y_Kp 1
-#define MOTION_Y_Ki 0
-#define MOTION_Y_Kd 0
+#define POS_Y_Kp 0
+#define POS_Y_Ki 0
+#define POS_Y_Kd 0
 
-#define MOTION_R_Kp 1
-#define MOTION_R_Ki 0
-#define MOTION_R_Kd 0
+#define POS_R_Kp 0
+#define POS_R_Ki 0
+#define POS_R_Kd 0

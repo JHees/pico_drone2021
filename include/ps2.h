@@ -1,11 +1,11 @@
-#include "pico/stdio.h"
 #include "hardware/spi.h"
+#include "pico/stdio.h"
 // #include "pico/binary_info.h"
 #define PS_PINOUT PS_CLK, PS_ATT, PS_COM, PS_DAT
 #define TICK_CLK 10
 class ps2
 {
-private:
+  private:
     const uint spi_do;
     const uint spi_di;
     const uint spi_cs;
@@ -42,12 +42,11 @@ private:
 
     };
 
-public:
+  public:
     typedef key_mask ps2_key;
     ps2() = default;
     ~ps2() = default;
-    ps2(uint CLK, uint CS, uint DO, uint DI)
-        : spi_do(DO), spi_di(DI), spi_cs(CS), spi_clk(CLK)
+    ps2(uint CLK, uint CS, uint DO, uint DI) : spi_do(DO), spi_di(DI), spi_cs(CS), spi_clk(CLK)
     {
         gpio_init(spi_clk);
         gpio_set_dir(spi_clk, GPIO_OUT);
@@ -65,7 +64,7 @@ public:
         gpio_put(spi_cs, 1);
     };
 
-private:
+  private:
     inline void cs_select()
     {
         asm volatile("nop \n nop \n nop");
@@ -160,7 +159,7 @@ private:
         // }
     }
 
-public:
+  public:
     bool fresh_data()
     {
         cs_select();
@@ -209,18 +208,19 @@ public:
 
         if (key == key_mask::LY || key == key_mask::RY)
         {
-            value -= 127;
+            value = 127 - value;
+            return value > 0 ? value / 127.0f * range : value / 128.0f * range;
         }
         else if (key == key_mask::LX || key == key_mask::RX)
         {
             value = 128 - value;
+            return value > 0 ? value / 128.0f * range : value / 127.0f * range;
         }
         else
             return value ? range : 0;
-        return value > 0 ? value / 128.0f * range : value / 127.0f * range;
     }
 
-    void test_all_key() const 
+    void test_all_key() const
     {
 #define PRINT_KEY(key) is_key_pressed(ps2_key::key) ? printf(#key " ") : 0
 #define PRINT_KEY_VALUE(key) printf(#key " %u ", key_value(ps2_key::key))

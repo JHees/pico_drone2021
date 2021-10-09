@@ -29,7 +29,7 @@ constexpr int max_nr_callback = 4;
 
 motor *motor_registry[max_nr_callback];
 void global_gpio_irq_callback(uint gpio, uint32_t event);
-bool global_motion_pid_callback(repeating_timer_t *rt);
+bool global_motion_callback(repeating_timer_t *rt);
 
 class motor
 {
@@ -111,9 +111,9 @@ class motor
     bool pid_callback(repeating_timer_t *rt)
     {
         speed_measured = get_speed();
-        // control = pid_control.adjust_in_formate(speed_measured, 20, MOTOR_MAX_SPEED);
-        // set_speed(control);
-        set_speed(pid_control.adjust_in_formate(speed_measured, 20, MOTOR_MAX_SPEED));
+        control = pid_control.adjust_in_formate(speed_measured, MOTOR_DEADZONE, MOTOR_MAX_SPEED);
+        set_speed(control);
+        // set_speed(pid_control.adjust_in_formate(speed_measured, MOTOR_DEADZONE, MOTOR_MAX_SPEED));
         return true;
     }
     void set_speed(int16_t speed)
@@ -179,7 +179,7 @@ class motor
         gpio_set_irq_enabled_with_callback(measureB_gpio, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true,
                                            global_gpio_irq_callback);
 
-        add_repeating_timer_ms(50, pid_callback_pool[idx], nullptr, &timer);
+        add_repeating_timer_ms(30, pid_callback_pool[idx], nullptr, &timer);
     };
     void set_speed_target(int16_t tt)
     {
@@ -196,35 +196,36 @@ class McCanum
     friend void global_gpio_irq_callback(uint gpio, uint32_t event);
     friend bool global_motion_pid_callback(repeating_timer_t *rt);
 
-  private:
+  public:
     motor LF, LB, RF, RB;
     const float coff_lw;
     // pid<int16_t> x_pid;
     // pid<int16_t> y_pid;
     // pid<int16_t> r_pid;
-
+    uint32_t timestamp_last;
     repeating_timer_t timer;
 
   public:
     int16_t mX, mY, mR;
+    int64_t integrator_x, integrator_y, integrator_r;
     McCanum(motor::pinout lf, pid_parameter lf_pid, motor::pinout lb, pid_parameter lb_pid, motor::pinout rf,
             pid_parameter rf_pid, motor::pinout rb, pid_parameter rb_pid)
         //  , pid_parameter x, pid_parameter y, pid_parameter r)
         : coff_lw(1), LF(lf, lf_pid), LB(lb, lb_pid), RF(rf, rf_pid), RB(rb, rb_pid)
-          //, x_pid(x), y_pid(y), r_pid(r)
-          {
-              // add_repeating_timer_ms(50, global_motion_pid_callback, nullptr, &timer);
-          };
+    //, x_pid(x), y_pid(y), r_pid(r)
+    {
+        add_repeating_timer_ms(50, global_motion_callback, nullptr, &timer);
+    };
     ~McCanum() = default;
 
   public:
     void set_motion(int16_t x_speed, int16_t y_speed, int16_t rotate)
     {
         int16_t speed[4] = {0};
-        speed[0] = -x_speed + y_speed - rotate * coff_lw;
-        speed[1] = x_speed + y_speed + rotate * coff_lw;
-        speed[2] = -x_speed + y_speed + rotate * coff_lw;
-        speed[3] = x_speed + y_speed - rotate * coff_lw;
+        speed[0] = -x_speed - y_speed - rotate * coff_lw;
+        speed[1] = x_speed - y_speed + rotate * coff_lw;
+        speed[2] = -x_speed - y_speed + rotate * coff_lw;
+        speed[3] = x_speed - y_speed - rotate * coff_lw;
 
         int16_t max = 0;
         max = max > ABS(speed[0]) ? max : ABS(speed[0]);
@@ -249,9 +250,28 @@ class McCanum
         int16_t speed[4] = {RF.speed(), LF.speed(), LB.speed(), RB.speed()};
 
         x_speed = (-speed[0] + speed[1] - speed[2] + speed[3]) / 4;
-        y_speed = (speed[0] + speed[1] + speed[2] + speed[3]) / 4;
+        y_speed = -(speed[0] + speed[1] + speed[2] + speed[3]) / 4;
         rotate = (-speed[0] + speed[1] + speed[2] - speed[3]) / 4 / coff_lw;
     };
+    void get_motion()
+    {
+        uint32_t timestamp = time_us_32();
+        get_motion(mX, mY, mR);
+        if (!timestamp_last)
+        {
+            integrator_x += mX * int64_t(timestamp - timestamp_last) / 1e3;
+            integrator_y += mY * int64_t(timestamp - timestamp_last) / 1e3;
+            integrator_r += mR * int64_t(timestamp - timestamp_last) / 1e3;
+        }
+        timestamp_last = timestamp;
+    }
+    void reset_integrator()
+    {
+        integrator_x = 0;
+        integrator_y = 0;
+        integrator_r = 0;
+        timestamp_last = 0;
+    }
     // void set_motion_target(int16_t x_speed, int16_t y_speed, int16_t rotate)
     // {
     //     x_pid.set_target(x_speed);

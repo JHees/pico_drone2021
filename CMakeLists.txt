@@ -22,7 +22,7 @@ pico_sdk_init()
 include_directories(${PROJECT_SOURCE_DIR}/include)
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(pico_drone main.cpp)
+add_executable(pico_drone pico.cpp)
 
 pico_set_program_name(pico_drone "pico_drone")
 pico_set_program_version(pico_drone "0.1")

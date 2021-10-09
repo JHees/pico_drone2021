@@ -41,11 +41,10 @@ template <class T> class pid
     {
         uint32_t time = time_us_32();
         T err = target - measure;
-        // if (std::abs(err) <= dead_zone)
-        // {
-        //     control=0;
-        // }
-
+        if (std::abs(err) <= dead_zone)
+        {
+            err=0;
+        }
         float timestep = ((int64_t)time - (int64_t)time_last) / 1e6;
         control += Kp * (err - error[1]) + Ki * err * timestep + Kd * (err - 2 * error[1] + error[0]) / timestep;
         error.push_back(err);
